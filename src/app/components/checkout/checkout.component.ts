@@ -31,6 +31,8 @@ export class CheckoutComponent implements OnInit {
 
   shippingAddressCities: City[] = [];
   billingAddressCities: City[] = [];
+
+  storage: Storage = sessionStorage;
   
   constructor(private formBuilder: FormBuilder,
               private shopFormService: ShopFormService,
