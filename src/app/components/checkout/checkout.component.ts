@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Address } from 'src/app/common/address';
-import { City } from 'src/app/common/city';
-import { Country } from 'src/app/common/country';
 import { Order } from 'src/app/common/order';
 import { OrderItem } from 'src/app/common/order-item';
 import { Purchase } from 'src/app/common/purchase';
@@ -26,11 +24,6 @@ export class CheckoutComponent implements OnInit {
 
   creditCardYears: number[] = [];
   creditCardMonths: number[] = [];
-
-  countries: Country[] = [];
-
-  shippingAddressCities: City[] = [];
-  billingAddressCities: City[] = [];
 
   storage: Storage = sessionStorage;
   
@@ -123,16 +116,7 @@ export class CheckoutComponent implements OnInit {
         this.creditCardYears = data;
       }
     );
-
-    // populate countries when form is displayed
-    this.shopFormService.getCountries().subscribe(
-      data => {
-        console.log("Retrieved countries: " + JSON.stringify(data));
-        this.countries = data;
-      }
-    );
-
-  }
+  } 
 
   reviewCartDetails() {
     // subscribe to cartService.totalQuantity and cartService.totalPrice
@@ -165,13 +149,9 @@ export class CheckoutComponent implements OnInit {
     if (event.target.checked) {
       this.checkoutFormGroup.controls.billingAddress
             .setValue(this.checkoutFormGroup.controls.shippingAddress.value);
-
-            this.billingAddressCities = this.shippingAddressCities;
     }
     else {
       this.checkoutFormGroup.controls.billingAddress.reset();
-
-      this.billingAddressCities = [];
     }
     
   }
@@ -203,18 +183,18 @@ export class CheckoutComponent implements OnInit {
     
     // populate purchase - shipping address
     purchase.shippingAddress = this.checkoutFormGroup.controls['shippingAddress'].value;
-    const shippingCity: City = JSON.parse(JSON.stringify(purchase.shippingAddress.city));
-    const shippingCountry: Country = JSON.parse(JSON.stringify(purchase.shippingAddress.country));
-    purchase.shippingAddress.city = shippingCity.name;
-    purchase.shippingAddress.country = shippingCountry.name;
+    const shippingCity: string = JSON.parse(JSON.stringify(purchase.shippingAddress.city));
+    const shippingCountry: string = JSON.parse(JSON.stringify(purchase.shippingAddress.country));
+    purchase.shippingAddress.city = shippingCity;
+    purchase.shippingAddress.country = shippingCountry;
 
 
     // populate purchase - billing address
     purchase.billingAddress = this.checkoutFormGroup.controls['billingAddress'].value;
-    const billingCity: City = JSON.parse(JSON.stringify(purchase.billingAddress.city));
-    const billingCountry: Country = JSON.parse(JSON.stringify(purchase.billingAddress.country));
-    purchase.billingAddress.city = billingCity.name;
-    purchase.billingAddress.country = billingCountry.name;
+    const billingCity: string = JSON.parse(JSON.stringify(purchase.billingAddress.city));
+    const billingCountry: string = JSON.parse(JSON.stringify(purchase.billingAddress.country));
+    purchase.billingAddress.city = billingCity;
+    purchase.billingAddress.country = billingCountry;
   
     // populate purchase - using the order and orderItems
     purchase.order = order;
@@ -271,32 +251,6 @@ export class CheckoutComponent implements OnInit {
     this.shopFormService.getCreditCardMonths(startMonth).subscribe(
       data => {
         this.creditCardMonths = data;
-      }
-    );
-  }
-
-  getCities(formGroupName: string){
-
-    const formGroup = this.checkoutFormGroup.get(formGroupName);
-
-    const countryCode = formGroup?.value.country.code;
-
-    const countryName = formGroup?.value.country.name;
-
-    console.log(`${formGroupName} country code : ${countryCode}`);
-    console.log(`${formGroupName} country name : ${countryName}`);
-
-    this.shopFormService.getCities(countryCode).subscribe(
-      data => {
-        if(formGroupName === 'shippingAddress'){
-          this.shippingAddressCities = data;
-        } else 
-        {
-          this.billingAddressCities = data;
-        }
-
-        // select first city by default
-        formGroup?.get('city')?.setValue(data[0]);
       }
     );
   }
