@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Address } from 'src/app/common/address';
 import { Order } from 'src/app/common/order';
 import { OrderItem } from 'src/app/common/order-item';
+import { OrderStatus } from 'src/app/common/order-status';
 import { Purchase } from 'src/app/common/purchase';
 import { CartService } from 'src/app/services/cart.service';
 import { CheckoutService } from 'src/app/services/checkout.service';
@@ -169,12 +169,16 @@ export class CheckoutComponent implements OnInit {
     order.totalPrice = this.totalPrice;
     order.totalQuantity = this.totalQuantity;
 
+    let orderStatus = new OrderStatus();
+    orderStatus.status ="fulfilled";
+
     // get cart items
     const cartItems = this.cartService.cartItems;
 
     // create orderItems from cartItems
     let orderItems: OrderItem[] = cartItems.map(tempCartItem => new OrderItem(tempCartItem));
 
+    
     // set up purchase
     let purchase = new Purchase();
     
